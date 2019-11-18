@@ -1,0 +1,27 @@
+<h2 class="mb-5">Cats page</h2>
+
+<div class="form-inline mb-4" *ngIf="isLoggedIn">
+  <div class="form-group mr-2">
+    <label for="newCat" class="sr-only">New cat</label>
+    <input
+      class="form-control"
+      id="newCat"
+      placeholder="New cat"
+      [formControl]="newCatControl"
+    />
+  </div>
+  <button type="button" class="btn btn-primary" (click)="addCat()">Add</button>
+</div>
+
+<ul class="list-group">
+  <li class="list-group-item  d-flex" *ngFor="let cat of cats$ | async">
+    <span>{{ cat.name }}</span>
+    <button
+      *ngIf="isAdmin"
+      class="btn btn-danger ml-auto"
+      (click)="removeCat(cat._id)"
+    >
+      X
+    </button>
+  </li>
+</ul>
