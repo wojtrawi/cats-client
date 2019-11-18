@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { FormControl, Validators } from '@angular/forms';
 import { BehaviorSubject } from 'rxjs';
-import { switchMap } from 'rxjs/operators';
+import { switchMap, tap } from 'rxjs/operators';
 
 import { CatsService } from '../../cats.service';
 import { AuthService } from './../../auth/auth.service';
@@ -13,10 +13,15 @@ import { AuthService } from './../../auth/auth.service';
 })
 export class CatsPageComponent {
   private refreshSubject = new BehaviorSubject<void>(null);
+  private loadingSubject = new BehaviorSubject<boolean>(true);
 
   readonly cats$ = this.refreshSubject.pipe(
+    tap(() => this.loadingSubject.next(true)),
     switchMap(() => this.catsService.getCats()),
+    tap(() => this.loadingSubject.next(false)),
   );
+
+  readonly isLoading$ = this.loadingSubject.asObservable();
 
   newCatControl = new FormControl('', [
     Validators.required,
