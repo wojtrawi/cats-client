@@ -37,6 +37,10 @@ export class CatsPageComponent {
     return this.authService.isAdmin;
   }
 
+  get hasErrorMessage(): boolean {
+    return this.newCatControl.touched && this.newCatControl.invalid;
+  }
+
   addCat() {
     this.newCatControl.markAsTouched();
 

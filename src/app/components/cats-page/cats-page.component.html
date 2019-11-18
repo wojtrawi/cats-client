@@ -1,16 +1,23 @@
 <h2 class="mb-5">Cats page</h2>
 
-<div class="form-inline mb-4" *ngIf="isLoggedIn">
-  <div class="form-group mr-2">
-    <label for="newCat" class="sr-only">New cat</label>
-    <input
-      class="form-control"
-      id="newCat"
-      placeholder="New cat"
-      [formControl]="newCatControl"
-    />
+<div *ngIf="isLoggedIn" class="mb-4">
+  <div class="form-inline mb-2">
+    <div class="form-group mr-2">
+      <label for="newCat" class="sr-only">New cat</label>
+      <input
+        class="form-control"
+        id="newCat"
+        placeholder="New cat"
+        [formControl]="newCatControl"
+      />
+    </div>
+    <button type="button" class="btn btn-primary" (click)="addCat()">
+      Add
+    </button>
   </div>
-  <button type="button" class="btn btn-primary" (click)="addCat()">Add</button>
+  <small *ngIf="hasErrorMessage" class="error-message">
+    Name must contain from 5 to 50 characters
+  </small>
 </div>
 
 <ul class="list-group">
