@@ -15,7 +15,7 @@ export class AuthService {
       domain: environment.auth0Domain,
       client_id: environment.auth0ClientId,
       audience: 'https://cats-api.demo.com',
-      redirect_uri: `${window.location.origin}/callback`,
+      redirect_uri: `${window.location.origin}${environment.pathPrefix}/callback`,
     }),
   ) as Observable<Auth0Client>).pipe(
     shareReplay(1),
@@ -73,7 +73,7 @@ export class AuthService {
   login(redirectPath = '/') {
     this.auth0Client$.subscribe((client: Auth0Client) => {
       client.loginWithRedirect({
-        redirect_uri: `${window.location.origin}/callback`,
+        redirect_uri: `${window.location.origin}${environment.pathPrefix}/callback`,
         appState: { target: redirectPath },
       });
     });
@@ -99,7 +99,7 @@ export class AuthService {
     this.auth0Client$.subscribe((client: Auth0Client) => {
       client.logout({
         client_id: environment.auth0ClientId,
-        returnTo: `${window.location.origin}`,
+        returnTo: `${window.location.origin}${environment.pathPrefix}`,
       });
     });
   }

@@ -5,6 +5,7 @@
 export const environment = {
   production: false,
   apiUrl: 'http://localhost:7000',
+  pathPrefix: '',
   auth0Domain: 'dev-43wokkyw.eu.auth0.com',
   auth0ClientId: 'znxv20jqUFK8MD7sRyRiQ7FNJUqD8udP',
 };
