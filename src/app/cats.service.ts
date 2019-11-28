@@ -1,5 +1,6 @@
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { Socket } from 'ngx-socket-io';
 import { ToastrService } from 'ngx-toastr';
 import { Observable, of } from 'rxjs';
 import { catchError, tap } from 'rxjs/operators';
@@ -14,7 +15,14 @@ interface Cat {
   providedIn: 'root',
 })
 export class CatsService {
-  constructor(private http: HttpClient, private toastrService: ToastrService) {}
+  readonly addCat$ = this.socket.fromEvent<string>('addCat');
+  readonly newCatAvailable$ = this.socket.fromEvent<void>('newCatAvailable');
+
+  constructor(
+    private http: HttpClient,
+    private socket: Socket,
+    private toastrService: ToastrService,
+  ) {}
 
   getCats(): Observable<Cat[]> {
     return this.http.get<Cat[]>(`${environment.apiUrl}/cats`).pipe(
@@ -32,6 +40,7 @@ export class CatsService {
       .pipe(
         tap(
           cat => {
+            this.socket.emit('addCat');
             this.toastrService.success(`Cat ${cat.name} has been added!`);
           },
           err => {

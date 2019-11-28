@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormControl, Validators } from '@angular/forms';
 import { BehaviorSubject } from 'rxjs';
 import { switchMap, tap } from 'rxjs/operators';
@@ -11,7 +11,7 @@ import { AuthService } from './../../auth/auth.service';
   templateUrl: './cats-page.component.html',
   styleUrls: ['./cats-page.component.scss'],
 })
-export class CatsPageComponent {
+export class CatsPageComponent implements OnInit {
   private refreshSubject = new BehaviorSubject<void>(null);
   private loadingSubject = new BehaviorSubject<boolean>(true);
 
@@ -46,19 +46,31 @@ export class CatsPageComponent {
     return this.newCatControl.touched && this.newCatControl.invalid;
   }
 
+  ngOnInit() {
+    this.initSocket();
+  }
+
   addCat() {
     this.newCatControl.markAsTouched();
 
     if (this.newCatControl.valid) {
       this.catsService.addCat(this.newCatControl.value).subscribe(() => {
         this.newCatControl.reset('');
-        this.refreshSubject.next();
       });
     }
   }
 
   removeCat(id: string) {
     this.catsService.removeCat(id).subscribe(() => {
+      this.refreshSubject.next();
+    });
+  }
+
+  private initSocket() {
+    // TODO unsubscribe
+    this.catsService.addCat$.subscribe(console.log);
+    this.catsService.newCatAvailable$.subscribe(() => {
+      console.log('newCatAvailable');
       this.refreshSubject.next();
     });
   }
