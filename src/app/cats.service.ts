@@ -3,20 +3,22 @@ import { Injectable } from '@angular/core';
 import { Socket } from 'ngx-socket-io';
 import { ToastrService } from 'ngx-toastr';
 import { Observable, of } from 'rxjs';
-import { catchError, tap } from 'rxjs/operators';
+import { catchError, map, tap } from 'rxjs/operators';
 import { environment } from 'src/environments/environment';
 
 interface Cat {
   _id: string;
   name: string;
+  isUserCat: boolean;
 }
 
 @Injectable({
   providedIn: 'root',
 })
 export class CatsService {
-  readonly addCat$ = this.socket.fromEvent<string>('addCat');
-  readonly newCatAvailable$ = this.socket.fromEvent<void>('newCatAvailable');
+  readonly newCatAvailable$ = this.socket
+    .fromEvent<void>('newCatAvailable')
+    .pipe(tap(() => this.toastrService.success('New cat available!!!')));
 
   constructor(
     private http: HttpClient,
@@ -25,7 +27,8 @@ export class CatsService {
   ) {}
 
   getCats(): Observable<Cat[]> {
-    return this.http.get<Cat[]>(`${environment.apiUrl}/cats`).pipe(
+    return this.http.get<{ docs: Cat[] }>(`${environment.apiUrl}/cats`).pipe(
+      map(({ docs }) => docs),
       catchError(err => {
         this.handleError(err);
 
@@ -40,7 +43,6 @@ export class CatsService {
       .pipe(
         tap(
           cat => {
-            this.socket.emit('addCat');
             this.toastrService.success(`Cat ${cat.name} has been added!`);
           },
           err => {
@@ -64,7 +66,7 @@ export class CatsService {
   }
 
   private handleError(err: HttpErrorResponse) {
-    this.toastrService.error(err.message, 'Error');
-    console.log(err);
+    this.toastrService.error(err.error.message, 'Error');
+    console.error(err);
   }
 }

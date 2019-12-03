@@ -30,7 +30,7 @@
   <li class="list-group-item  d-flex" *ngFor="let cat of cats$ | async">
     <span>{{ cat.name }}</span>
     <button
-      *ngIf="isAdmin"
+      *ngIf="isAdmin || cat.isUserCat"
       class="btn btn-danger ml-auto"
       (click)="removeCat(cat._id)"
     >

@@ -1,21 +1,24 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { FormControl, Validators } from '@angular/forms';
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, merge } from 'rxjs';
 import { switchMap, tap } from 'rxjs/operators';
 
+import { AuthService } from '../../auth/auth.service';
 import { CatsService } from '../../cats.service';
-import { AuthService } from './../../auth/auth.service';
 
 @Component({
   selector: 'app-cats-page',
   templateUrl: './cats-page.component.html',
   styleUrls: ['./cats-page.component.scss'],
 })
-export class CatsPageComponent implements OnInit {
+export class CatsPageComponent {
   private refreshSubject = new BehaviorSubject<void>(null);
   private loadingSubject = new BehaviorSubject<boolean>(true);
 
-  readonly cats$ = this.refreshSubject.pipe(
+  readonly cats$ = merge(
+    this.refreshSubject,
+    this.catsService.newCatAvailable$,
+  ).pipe(
     tap(() => this.loadingSubject.next(true)),
     switchMap(() => this.catsService.getCats()),
     tap(() => this.loadingSubject.next(false)),
@@ -46,10 +49,6 @@ export class CatsPageComponent implements OnInit {
     return this.newCatControl.touched && this.newCatControl.invalid;
   }
 
-  ngOnInit() {
-    this.initSocket();
-  }
-
   addCat() {
     this.newCatControl.markAsTouched();
 
@@ -62,15 +61,6 @@ export class CatsPageComponent implements OnInit {
 
   removeCat(id: string) {
     this.catsService.removeCat(id).subscribe(() => {
-      this.refreshSubject.next();
-    });
-  }
-
-  private initSocket() {
-    // TODO unsubscribe
-    this.catsService.addCat$.subscribe(console.log);
-    this.catsService.newCatAvailable$.subscribe(() => {
-      console.log('newCatAvailable');
       this.refreshSubject.next();
     });
   }

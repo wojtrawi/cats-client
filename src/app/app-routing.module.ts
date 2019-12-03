@@ -16,6 +16,7 @@ const routes: Routes = [
   {
     path: 'cats',
     component: CatsPageComponent,
+    canActivate: [AuthGuard],
   },
   {
     path: 'profile',
